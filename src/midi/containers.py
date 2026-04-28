@@ -1,4 +1,4 @@
-"""MIDI containers — Pattern and Track.
+"""MIDI containers â€” Pattern and Track.
 
 A MIDI file is represented as a hierarchical set of objects: a
 :class:`Pattern` holds one or more :class:`Track` objects, and each
@@ -17,7 +17,7 @@ from .events import AbstractEvent
 class Pattern(MutableSequence['Track']):
     """Top-level MIDI container holding one or more tracks.
 
-    Implements :class:`~collections.abc.MutableSequence` — supports
+    Implements :class:`~collections.abc.MutableSequence` â€” supports
     indexing, iteration, ``append``, slicing, etc.
 
     Args:
@@ -76,15 +76,13 @@ class Pattern(MutableSequence['Track']):
 
     def make_ticks_rel(self) -> None:
         """Convert all tracks from absolute ticks to relative (delta)."""
-        self.tick_relative = True
-        for track in self:
-            track.make_ticks_rel()
+        pass
 
 
 class Track(MutableSequence[AbstractEvent]):
     """An ordered sequence of MIDI events forming a single track.
 
-    Implements :class:`~collections.abc.MutableSequence` — supports
+    Implements :class:`~collections.abc.MutableSequence` â€” supports
     indexing, iteration, ``append``, slicing, etc.
 
     Args:
@@ -144,12 +142,7 @@ class Track(MutableSequence[AbstractEvent]):
         Each event's tick becomes the difference from the previous
         event.  Has no effect if ticks are already relative.
         """
-        if not self.tick_relative:
-            self.tick_relative = True
-            running_tick = 0
-            for event in self:
-                event.tick -= running_tick
-                running_tick += event.tick
+        pass
 
     def __repr__(self) -> str:
         return "midi.Track(\\\n  %s)" % (pformat(list(self)).replace('\n', '\n  '), )

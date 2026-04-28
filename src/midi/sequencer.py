@@ -29,35 +29,17 @@ class TempoMap(MutableSequence[SetTempoEvent]):
         self._items.sort(key=key, reverse=reverse)
 
     def add_and_update(self, event: SetTempoEvent) -> None:
-        self.add(event)
-        self.update()
+        pass
 
     def add(self, event: SetTempoEvent) -> None:
         # get tempo in microseconds per beat
-        tempo = event.mpqn
-        # convert into milliseconds per beat
-        tempo = tempo / 1000.0
-        # generate ms per tick
-        event.mpt = tempo / self.stream.resolution
-        self.append(event)
+        pass
 
     def update(self) -> None:
-        self.sort()
-        # adjust running time
-        last = None
-        for event in self:
-            if last:
-                event.msdelay = last.msdelay + \
-                    int(last.mpt * (event.tick - last.tick))
-            last = event
+        pass
 
     def get_tempo(self, offset: int = 0) -> SetTempoEvent:
-        last = self[0]
-        for tm in self[1:]:
-            if tm.tick > offset:
-                return last
-            last = tm
-        return last
+        pass
 
 
 class EventStreamIterator:
@@ -86,27 +68,7 @@ class EventStreamIterator:
         return self
 
     def __next_edge(self) -> None:
-        if self.endoftrack:
-            raise StopIteration("")
-        lastedge = self.window_edge
-        self.window_edge += int(self.window_length / self.tempo.mpt)
-        if self.window_edge > self.ttp:
-            # We're past the tempo-marker.
-            oldttp = self.ttp
-            try:
-                self.ttp = next(self._ttpts_iter)
-            except StopIteration:
-                # End of Track!
-                self.window_edge = self.ttp
-                self.endoftrack = True
-                return
-            # Calculate the next window edge, taking into
-            # account the tempo change.
-            msused = (oldttp - lastedge) * self.tempo.mpt
-            msleft = self.window_length - msused
-            self.tempo = next(self._tempomap_iter)
-            ticksleft = msleft / self.tempo.mpt
-            self.window_edge = ticksleft + self.tempo.tick
+        pass
 
     def __next__(self) -> list[AbstractEvent]:
         ret: list[AbstractEvent] = []

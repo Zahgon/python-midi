@@ -56,8 +56,7 @@ def main():
     stop = False
 
     def handle_sigint(signum, frame):
-        nonlocal stop
-        stop = True
+        pass
 
     signal.signal(signal.SIGINT, handle_sigint)
 

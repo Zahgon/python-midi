@@ -1,4 +1,4 @@
-"""MIDI event types — channel messages, meta events, and system messages.
+"""MIDI event types â€” channel messages, meta events, and system messages.
 
 All event classes inherit from :class:`AbstractEvent` and are automatically
 registered in :class:`EventRegistry` via ``__init_subclass__``.
@@ -39,7 +39,7 @@ class AbstractEvent:
         NoteOnEvent(tick=0, pitch=60, velocity=100, channel=0)
 
     Attributes:
-        tick: Tick offset — relative (delta) or absolute depending on
+        tick: Tick offset â€” relative (delta) or absolute depending on
             the containing Track.
         data: Event payload as a tuple of ints.  Subclasses provide
             typed properties (e.g. ``pitch``, ``velocity``) that
@@ -118,9 +118,7 @@ class Event(AbstractEvent):
         super().__init__(**kw)
 
     def copy(self, **kw: object) -> Event:
-        _kw: dict[str, object] = {'channel': self.channel, 'tick': self.tick, 'data': list(self.data)}
-        _kw.update(kw)
-        return self.__class__(**_kw)
+        pass
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AbstractEvent):
@@ -161,16 +159,14 @@ class MetaEvent(AbstractEvent):
 
     @property
     def data(self) -> tuple[int, ...]:
-        return tuple(self._data)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self._data = list(value)
+        pass
 
     def copy(self, **kw: object) -> MetaEvent:
-        _kw: dict[str, object] = {'tick': self.tick, 'data': list(self.data)}
-        _kw.update(kw)
-        return self.__class__(**_kw)
+        pass
 
     @classmethod
     def is_event(cls, statusmsg: int) -> bool:
@@ -193,23 +189,22 @@ class NoteEvent(Event):
         super().__init__(**kw)
 
     @property
-    def pitch(self) -> int: return self._pitch
+    pass
     @pitch.setter
-    def pitch(self, val: int) -> None: self._pitch = val
+    pass
 
     @property
-    def velocity(self) -> int: return self._velocity
+    pass
     @velocity.setter
-    def velocity(self, val: int) -> None: self._velocity = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._pitch, self._velocity)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self._pitch = value[0] if len(value) > 0 else 0
-        self._velocity = value[1] if len(value) > 1 else 0
+        pass
 
 
 class NoteOnEvent(NoteEvent):
@@ -245,23 +240,22 @@ class AfterTouchEvent(Event):
         super().__init__(**kw)
 
     @property
-    def pitch(self) -> int: return self._pitch
+    pass
     @pitch.setter
-    def pitch(self, val: int) -> None: self._pitch = val
+    pass
 
     @property
-    def value(self) -> int: return self._value
+    pass
     @value.setter
-    def value(self, val: int) -> None: self._value = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._pitch, self._value)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self._pitch = value[0] if len(value) > 0 else 0
-        self._value = value[1] if len(value) > 1 else 0
+        pass
 
 
 class ControlChangeEvent(Event):
@@ -282,23 +276,22 @@ class ControlChangeEvent(Event):
         super().__init__(**kw)
 
     @property
-    def control(self) -> int: return self._control
+    pass
     @control.setter
-    def control(self, val: int) -> None: self._control = val
+    pass
 
     @property
-    def value(self) -> int: return self._value
+    pass
     @value.setter
-    def value(self, val: int) -> None: self._value = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._control, self._value)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self._control = value[0] if len(value) > 0 else 0
-        self._value = value[1] if len(value) > 1 else 0
+        pass
 
 
 class ProgramChangeEvent(Event):
@@ -317,17 +310,17 @@ class ProgramChangeEvent(Event):
         super().__init__(**kw)
 
     @property
-    def value(self) -> int: return self._value
+    pass
     @value.setter
-    def value(self, val: int) -> None: self._value = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._value,)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self._value = value[0] if len(value) > 0 else 0
+        pass
 
 
 class ChannelAfterTouchEvent(Event):
@@ -346,17 +339,17 @@ class ChannelAfterTouchEvent(Event):
         super().__init__(**kw)
 
     @property
-    def value(self) -> int: return self._value
+    pass
     @value.setter
-    def value(self, val: int) -> None: self._value = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._value,)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self._value = value[0] if len(value) > 0 else 0
+        pass
 
 
 class PitchWheelEvent(Event):
@@ -376,19 +369,17 @@ class PitchWheelEvent(Event):
         super().__init__(**kw)
 
     @property
-    def pitch(self) -> int: return self._pitch
+    pass
     @pitch.setter
-    def pitch(self, val: int) -> None: self._pitch = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        value = self._pitch + 0x2000
-        return (value & 0x7F, (value >> 7) & 0x7F)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        if len(value) >= 2:
-            self._pitch = ((value[1] << 7) | value[0]) - 0x2000
+        pass
 
 
 class SysexEvent(Event):
@@ -407,11 +398,11 @@ class SysexEvent(Event):
 
     @property
     def data(self) -> tuple[int, ...]:
-        return tuple(self._data)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self._data = list(value)
+        pass
 
     @classmethod
     def is_event(cls, statusmsg: int) -> bool:
@@ -427,7 +418,7 @@ class SystemRealTimeEvent(AbstractEvent):
         super(AbstractEvent, cls).__init_subclass__(**kwargs)
 
     @property
-    def data(self) -> tuple[int, ...]: return ()
+    pass
 
     @data.setter
     def data(self, value) -> None: pass
@@ -471,18 +462,17 @@ class SongPositionPointerEvent(AbstractEvent):
         super().__init__(**kw)
 
     @property
-    def position(self) -> int: return self._position
+    pass
     @position.setter
-    def position(self, val: int) -> None: self._position = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._position & 0x7F, (self._position >> 7) & 0x7F)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        if len(value) >= 2:
-            self._position = (value[1] << 7) | value[0]
+        pass
 
 
 class SequenceNumberMetaEvent(MetaEvent):
@@ -508,11 +498,11 @@ class MetaEventWithText(MetaEvent):
 
     @property
     def data(self) -> tuple[int, ...]:
-        return tuple(ord(c) for c in self.text)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        self.text = ''.join(chr(b) for b in value)
+        pass
 
     def __repr__(self) -> str:
         return self.__baserepr__(['text'])
@@ -585,15 +575,14 @@ class UnknownMetaEvent(MetaEvent):
 
     @property
     def metacommand(self) -> int:
-        return self._metacommand
+        pass
 
     @metacommand.setter
     def metacommand(self, val: int) -> None:
-        self._metacommand = val
+        pass
 
     def copy(self, **kw: object) -> UnknownMetaEvent:
-        kw['metacommand'] = self.metacommand
-        return super().copy(**kw)
+        pass
 
 class ChannelPrefixEvent(MetaEvent):
     """Channel Prefix meta event (``0x20``)."""
@@ -641,24 +630,21 @@ class SetTempoEvent(MetaEvent):
 
     @property
     def data(self) -> tuple[int, ...]:
-        return ((self._mpqn >> 16) & 0xFF,
-                (self._mpqn >> 8) & 0xFF,
-                self._mpqn & 0xFF)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        if len(value) >= 3:
-            self._mpqn = (value[0] << 16) | (value[1] << 8) | value[2]
+        pass
 
     @property
-    def mpqn(self) -> int: return self._mpqn
+    pass
     @mpqn.setter
-    def mpqn(self, val: int) -> None: self._mpqn = val
+    pass
 
     @property
-    def bpm(self) -> float: return float(6e7) / self._mpqn
+    pass
     @bpm.setter
-    def bpm(self, bpm: float) -> None: self._mpqn = int(float(6e7) / bpm)
+    pass
 
 class SmpteOffsetEvent(MetaEvent):
     """SMPTE Offset meta event (``0x54``)."""
@@ -690,36 +676,32 @@ class TimeSignatureEvent(MetaEvent):
         super().__init__(**kw)
 
     @property
-    def numerator(self) -> int: return self._numerator
+    pass
     @numerator.setter
-    def numerator(self, val: int) -> None: self._numerator = val
+    pass
 
     @property
-    def denominator(self) -> int: return 2 ** self._denominator_power
+    pass
     @denominator.setter
-    def denominator(self, val: int) -> None: self._denominator_power = int(math.log(val, 2))
+    pass
 
     @property
-    def metronome(self) -> int: return self._metronome
+    pass
     @metronome.setter
-    def metronome(self, val: int) -> None: self._metronome = val
+    pass
 
     @property
-    def thirtyseconds(self) -> int: return self._thirtyseconds
+    pass
     @thirtyseconds.setter
-    def thirtyseconds(self, val: int) -> None: self._thirtyseconds = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._numerator, self._denominator_power, self._metronome, self._thirtyseconds)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        if len(value) >= 4:
-            self._numerator = value[0]
-            self._denominator_power = value[1]
-            self._metronome = value[2]
-            self._thirtyseconds = value[3]
+        pass
 
 
 class KeySignatureEvent(MetaEvent):
@@ -741,27 +723,24 @@ class KeySignatureEvent(MetaEvent):
 
     @property
     def alternatives(self) -> int:
-        d = self._alternatives
-        return d - 256 if d > 127 else d
+        pass
 
     @alternatives.setter
     def alternatives(self, val: int) -> None:
-        self._alternatives = 256 + val if val < 0 else val
+        pass
 
     @property
-    def minor(self) -> int: return self._minor
+    pass
     @minor.setter
-    def minor(self, val: int) -> None: self._minor = val
+    pass
 
     @property
     def data(self) -> tuple[int, ...]:
-        return (self._alternatives, self._minor)
+        pass
 
     @data.setter
     def data(self, value) -> None:
-        if len(value) >= 2:
-            self._alternatives = value[0]
-            self._minor = value[1]
+        pass
 
 
 class SequencerSpecificEvent(MetaEvent):

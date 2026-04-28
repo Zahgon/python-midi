@@ -1,4 +1,4 @@
-"""MIDI Clock — source and sink, platform-agnostic.
+"""MIDI Clock â€” source and sink, platform-agnostic.
 
 Uses only sequencer.event_write(event, tick=True) for output.
 Works identically on CoreMIDI (macOS) and ALSA (Linux).
@@ -33,43 +33,38 @@ class ClockSource:
 
     @property
     def bpm(self) -> float:
-        return self._bpm
+        pass
 
     @bpm.setter
     def bpm(self, value: float) -> None:
-        self._bpm = value
-        if self._running:
-            self._seq.change_tempo(int(value))
+        pass
 
     @property
     def running(self) -> bool:
-        return self._running
+        pass
 
     @property
     def pulse(self) -> int:
-        return self._pulse
+        pass
 
     @property
     def beat(self) -> float:
-        return self._pulse / self.PPQ
+        pass
 
     @property
     def bar(self) -> float:
-        beats_per_bar = self._numerator * (4 / self._denominator)
-        return self.beat / beats_per_bar
+        pass
 
     def set_time_signature(self, numerator: int = 4, denominator: int = 4) -> None:
-        self._numerator = numerator
-        self._denominator = denominator
+        pass
 
     def _ticks_per_pulse(self) -> float:
         """Sequencer ticks per MIDI clock pulse."""
-        resolution = self._seq.sequencer_resolution
-        return resolution / self.PPQ
+        pass
 
     def tick_for_pulse(self, pulse: int) -> int:
         """Return the sequencer tick value for a given pulse number."""
-        return self._start_tick + int(pulse * self._ticks_per_pulse())
+        pass
 
     def start(self) -> None:
         """Send Start event and begin scheduling clock pulses."""
@@ -91,10 +86,7 @@ class ClockSource:
 
     def cont(self) -> None:
         """Send Continue event and resume scheduling."""
-        self._running = True
-        ev = midi.ContinueEvent()
-        ev.tick = self._seq.queue_get_tick_time()
-        self._seq.event_write(ev, tick=True)
+        pass
 
     def schedule_ahead(self, pulses: int = 48) -> None:
         """Pre-schedule clock pulses into the future via event_write(tick=True).
@@ -102,15 +94,7 @@ class ClockSource:
         Only schedules pulses beyond what's already been scheduled.
         Call this periodically from your run loop.
         """
-        if not self._running:
-            return
-        target = self._pulse + pulses
-        while self._scheduled < target:
-            ev = midi.ClockEvent()
-            ev.tick = self.tick_for_pulse(self._scheduled)
-            self._seq.event_write(ev, tick=True)
-            self._scheduled += 1
-        self._pulse = target
+        pass
 
 
 class ClockSink:
@@ -136,78 +120,32 @@ class ClockSink:
 
     @property
     def running(self) -> bool:
-        return self._running
+        pass
 
     @property
     def pulse(self) -> int:
-        return self._pulse
+        pass
 
     @property
     def beat(self) -> float:
-        return self._pulse / self.PPQ
+        pass
 
     @property
     def bar(self) -> float:
-        beats_per_bar = self._numerator * (4 / self._denominator)
-        return self.beat / beats_per_bar
+        pass
 
     def set_time_signature(self, numerator: int = 4, denominator: int = 4) -> None:
-        self._numerator = numerator
-        self._denominator = denominator
+        pass
 
     @property
     def bpm(self) -> float:
         """Estimated BPM from wall-clock inter-pulse intervals."""
-        if self._smoothed_interval is None or self._smoothed_interval <= 0:
-            return 0.0
-        seconds_per_beat = self._smoothed_interval * self.PPQ
-        return 60.0 / seconds_per_beat
+        pass
 
     def tick_for_next_pulse(self, offset: int = 0) -> int:
         """Predict tick for the next clock pulse (or +offset pulses ahead)."""
-        if self._last_tick is None or self._smoothed_tick_interval is None:
-            return 0
-        return self._last_tick + int(self._smoothed_tick_interval * (1 + offset))
+        pass
 
     def process(self, event: midi.AbstractEvent) -> None:
         """Feed events from event_read(). Recognizes Clock/Start/Stop/Continue/SPP."""
-        if isinstance(event, midi.StartEvent):
-            self._running = True
-            self._pulse = 0
-            self._last_tick = None
-            self._last_time = None
-            self._smoothed_interval = None
-            self._smoothed_tick_interval = None
-        elif isinstance(event, midi.StopEvent):
-            self._running = False
-        elif isinstance(event, midi.ContinueEvent):
-            self._running = True
-        elif isinstance(event, midi.SongPositionPointerEvent):
-            # SPP position is in sixteenth notes; 1 sixteenth = 6 pulses
-            self._pulse = event.position * 6
-        elif isinstance(event, midi.ClockEvent):
-            if self._running:
-                now = time.monotonic()
-                if self._last_time is not None:
-                    dt = now - self._last_time
-                    if dt > 0:
-                        if self._smoothed_interval is None:
-                            self._smoothed_interval = dt
-                        else:
-                            self._smoothed_interval = (
-                                self._alpha * dt +
-                                (1 - self._alpha) * self._smoothed_interval
-                            )
-                if self._last_tick is not None:
-                    tick_delta = event.tick - self._last_tick
-                    if tick_delta > 0:
-                        if self._smoothed_tick_interval is None:
-                            self._smoothed_tick_interval = float(tick_delta)
-                        else:
-                            self._smoothed_tick_interval = (
-                                self._alpha * tick_delta +
-                                (1 - self._alpha) * self._smoothed_tick_interval
-                            )
-                self._last_time = now
-                self._last_tick = event.tick
-                self._pulse += 1
+        pass

@@ -14,19 +14,7 @@ __SWIG_NS_SET__ = frozenset([
 
 
 def stringify(name: str, obj: object, indent: int = 0) -> str:
-    retstr = ''
-    datafields = False
-    if getattr(obj, 'this', False):
-        datafields = dir(obj)
-        # filter unwanted names
-        datafields = list(set(datafields) - __SWIG_NS_SET__)
-        retstr += '%s%s ::\n' % ('    ' * indent, name)
-        for key in datafields:
-            value = getattr(obj, key, "n/a")
-            retstr += stringify(key, value, indent+1)
-    else:
-        retstr += '%s%s: %s\n' % ('    ' * indent, name, obj)
-    return retstr
+    pass
 
 
 class Sequencer:
@@ -63,21 +51,15 @@ class Sequencer:
             S.snd_seq_close(self.client)
 
     def init(self) -> None:
-        self._init_handle()
-        self._init_port()
-        self._init_queue()
+        pass
 
     @property
     def nonblock(self) -> bool:
-        return self.alsa_sequencer_mode == S.SND_SEQ_NONBLOCK
+        pass
 
     @nonblock.setter
     def nonblock(self, value: bool) -> None:
-        if value:
-            self.alsa_sequencer_mode = S.SND_SEQ_NONBLOCK
-        else:
-            self.alsa_sequencer_mode = 0
-        S.snd_seq_nonblock(self.client, self.alsa_sequencer_mode)
+        pass
 
     def _error(self, errcode: int) -> None:
         strerr = S.snd_strerror(errcode)
@@ -85,26 +67,10 @@ class Sequencer:
         raise RuntimeError(msg)
 
     def _init_handle(self) -> None:
-        ret = S.open_client(self.alsa_sequencer_name,
-                            self.alsa_sequencer_type,
-                            self.alsa_sequencer_stream,
-                            self.alsa_sequencer_mode)
-        if ret is None:
-            self._error(ret)
-        self.client = ret
-        self.client_id = S.snd_seq_client_id(self.client)
-        self.output_buffer_size = S.snd_seq_get_output_buffer_size(self.client)
-        self.input_buffer_size = S.snd_seq_get_input_buffer_size(self.client)
-        self._set_poll_descriptors()
+        pass
 
     def _init_port(self) -> None:
-        err = S.snd_seq_create_simple_port(self.client,
-                                            self.alsa_port_name,
-                                            self.alsa_port_caps,
-                                            self.alsa_port_type)
-        if err < 0:
-            self._error(err)
-        self.port = err
+        pass
 
     def _new_subscribe(self, sender, dest, read: bool = True):
         subscribe = S.new_port_subscribe()
@@ -139,13 +105,7 @@ class Sequencer:
         return addr
 
     def _init_queue(self) -> None:
-        err = S.snd_seq_alloc_named_queue(self.client, self.alsa_queue_name)
-        if err < 0:
-            self._error(err)
-        self.queue = err
-        adjtempo = int(60.0 * 1000000.0 / self.sequencer_tempo)
-        S.init_queue_tempo(self.client, self.queue,
-                            adjtempo, self.sequencer_resolution)
+        pass
 
     def _control_queue(self, ctype: int, cvalue: int, event=None) -> None:
         err = S.snd_seq_control_queue(self.client, self.queue, ctype, cvalue, event)
@@ -154,10 +114,7 @@ class Sequencer:
         self.drain()
 
     def _set_event_broadcast(self, event) -> None:
-        event.source.client = self.client_id
-        event.source.port = self.port
-        event.dest.client = S.SND_SEQ_ADDRESS_SUBSCRIBERS
-        event.dest.port = S.SND_SEQ_ADDRESS_UNKNOWN
+        pass
 
     def queue_get_tick_time(self) -> int:
         status = S.new_queue_status(self.client, self.queue)
@@ -167,11 +124,7 @@ class Sequencer:
         return res
 
     def queue_get_real_time(self) -> tuple[int, int]:
-        status = S.new_queue_status(self.client, self.queue)
-        S.snd_seq_get_queue_status(self.client, self.queue, status)
-        res = S.snd_seq_queue_status_get_real_time(status)
-        S.free_queue_status(status)
-        return (res.tv_sec, res.tv_nsec)
+        pass
 
     def change_tempo(self, tempo: int, event=None) -> bool:
         adjbpm = int(60.0 * 1000000.0 / tempo)
@@ -185,9 +138,7 @@ class Sequencer:
             self._queue_running = True
 
     def continue_sequencer(self, event=None) -> None:
-        if not self._queue_running:
-            self._control_queue(S.SND_SEQ_EVENT_CONTINUE, 0, event)
-            self._queue_running = True
+        pass
 
     def stop_sequencer(self, event=None) -> None:
         if self._queue_running:
@@ -198,21 +149,19 @@ class Sequencer:
         S.snd_seq_drain_output(self.client)
 
     def queue_eventlen(self) -> None:
-        status = S.new_queue_status(self.client, self.queue)
-        S.snd_seq_queue_status_get_events(status)
+        pass
 
     def _set_poll_descriptors(self) -> None:
-        self._poll_descriptors = S.client_poll_descriptors(self.client)
+        pass
 
     def configure_poll(self, poll) -> None:
-        for fd in self._poll_descriptors:
-            poll.register(fd, select.POLLIN)
+        pass
 
     def drop_output(self) -> None:
-        S.snd_seq_drop_output_buffer(self.client)
+        pass
 
     def output_pending(self) -> int:
-        return S.snd_seq_event_output_pending(self.client)
+        pass
 
     ## EVENT HANDLERS
     ##
@@ -359,8 +308,7 @@ class SequencerHardware(Sequencer):
             return retstr
 
         def add_port(self, port: int, name: str, caps: int) -> None:
-            port_obj = self.Port(port, name, caps)
-            self._ports[name] = port_obj
+            pass
 
         def __iter__(self):
             return iter(self._ports.values())
@@ -369,7 +317,7 @@ class SequencerHardware(Sequencer):
             return len(self._ports)
 
         def get_port(self, key: str) -> SequencerHardware.Client.Port:
-            return self._ports[key]
+            pass
         __getitem__ = get_port
 
         class Port:
@@ -397,9 +345,7 @@ class SequencerHardware(Sequencer):
                 return retstr
 
     def init(self) -> None:
-        self._clients: dict[str, SequencerHardware.Client] = {}
-        self._init_handle()
-        self._query_clients()
+        pass
 
     def __iter__(self):
         return iter(self._clients.values())
@@ -408,7 +354,7 @@ class SequencerHardware(Sequencer):
         return len(self._clients)
 
     def get_client(self, key: str) -> SequencerHardware.Client:
-        return self._clients[key]
+        pass
     __getitem__ = get_client
 
     def get_client_and_port(self, cname: str, pname: str) -> tuple[int, int]:
@@ -423,41 +369,13 @@ class SequencerHardware(Sequencer):
         return retstr
 
     def _query_clients(self) -> None:
-        self._clients = {}
-        S.snd_seq_drop_output(self.client)
-        cinfo = S.new_client_info()
-        pinfo = S.new_port_info()
-        S.snd_seq_client_info_set_client(cinfo, -1)
-        # for each client
-        while S.snd_seq_query_next_client(self.client, cinfo) >= 0:
-            client = S.snd_seq_client_info_get_client(cinfo)
-            cname = S.snd_seq_client_info_get_name(cinfo)
-            cobj = self.Client(client, cname)
-            self._clients[cname] = cobj
-            # get port data
-            S.snd_seq_port_info_set_client(pinfo, client)
-            S.snd_seq_port_info_set_port(pinfo, -1)
-            while (S.snd_seq_query_next_port(self.client, pinfo) >= 0):
-                cap = S.snd_seq_port_info_get_capability(pinfo)
-                client = S.snd_seq_port_info_get_client(pinfo)
-                port = S.snd_seq_port_info_get_port(pinfo)
-                pname = S.snd_seq_port_info_get_name(pinfo)
-                cobj.add_port(port, pname, cap)
+        pass
 
 
 def find_port_by_name(client_name: str, port_name: str | None = None) -> tuple[int, int] | None:
     """Find an ALSA sequencer client:port by name.
     Returns (client_id, port_id) or None."""
-    hw = SequencerHardware()
-    for client in hw:
-        if client.name == client_name:
-            if port_name is None:
-                for port in client:
-                    return (client.client, port.port)
-            else:
-                port = client[port_name]
-                return (client.client, port.port)
-    return None
+    pass
 
 
 class SequencerRead(Sequencer):
@@ -501,11 +419,7 @@ class SequencerDuplex(Sequencer):
                          alsa_port_caps=alsa_port_caps, **kw)
 
     def subscribe_read_port(self, client: int, port: int) -> None:
-        sender = self._new_address(client, port)
-        dest = self._my_address()
-        subscribe = self._new_subscribe(sender, dest, read=True)
-        S.snd_seq_port_subscribe_set_time_update(subscribe, True)
-        self._subscribe_port(subscribe)
+        pass
 
     def subscribe_write_port(self, client: int, port: int) -> None:
         sender = self._my_address()

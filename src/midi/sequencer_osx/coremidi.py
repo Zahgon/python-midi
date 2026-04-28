@@ -79,12 +79,7 @@ def cfstring_create(s: str) -> CFStringRef:
 
 
 def cfstring_to_str(cfstr: CFStringRef) -> str:
-    length = _core_foundation.CFStringGetLength(cfstr)
-    buf_size = length * 4 + 1
-    buf = ctypes.create_string_buffer(buf_size)
-    if _core_foundation.CFStringGetCString(cfstr, buf, buf_size, kCFStringEncodingUTF8):
-        return buf.value.decode('utf-8')
-    return ''
+    pass
 
 
 def cfrelease(ref: c_void_p) -> None:
@@ -102,17 +97,11 @@ _coremidi.MIDIClientDispose.argtypes = [MIDIClientRef]
 
 
 def midi_client_create(name: str) -> MIDIClientRef:
-    client = MIDIClientRef()
-    cfname = cfstring_create(name)
-    status = _coremidi.MIDIClientCreate(cfname, None, None, byref(client))
-    cfrelease(cfname)
-    if status != 0:
-        raise OSError(f"MIDIClientCreate failed with status {status}")
-    return client
+    pass
 
 
 def midi_client_dispose(client: MIDIClientRef) -> None:
-    _coremidi.MIDIClientDispose(client)
+    pass
 
 
 # --- Ports ---
@@ -125,24 +114,12 @@ _coremidi.MIDIInputPortCreate.argtypes = [MIDIClientRef, CFStringRef, MIDIReadPr
 
 
 def midi_output_port_create(client: MIDIClientRef, name: str) -> MIDIPortRef:
-    port = MIDIPortRef()
-    cfname = cfstring_create(name)
-    status = _coremidi.MIDIOutputPortCreate(client, cfname, byref(port))
-    cfrelease(cfname)
-    if status != 0:
-        raise OSError(f"MIDIOutputPortCreate failed with status {status}")
-    return port
+    pass
 
 
 def midi_input_port_create(client: MIDIClientRef, name: str,
                            read_proc: MIDIReadProc) -> MIDIPortRef:
-    port = MIDIPortRef()
-    cfname = cfstring_create(name)
-    status = _coremidi.MIDIInputPortCreate(client, cfname, read_proc, None, byref(port))
-    cfrelease(cfname)
-    if status != 0:
-        raise OSError(f"MIDIInputPortCreate failed with status {status}")
-    return port
+    pass
 
 
 # --- Virtual endpoints ---
@@ -166,13 +143,7 @@ def midi_source_create(client: MIDIClientRef, name: str) -> MIDIEndpointRef:
 
 def midi_destination_create(client: MIDIClientRef, name: str,
                             read_proc: MIDIReadProc) -> MIDIEndpointRef:
-    endpoint = MIDIEndpointRef()
-    cfname = cfstring_create(name)
-    status = _coremidi.MIDIDestinationCreate(client, cfname, read_proc, None, byref(endpoint))
-    cfrelease(cfname)
-    if status != 0:
-        raise OSError(f"MIDIDestinationCreate failed with status {status}")
-    return endpoint
+    pass
 
 
 # --- Send / Receive ---
@@ -213,9 +184,7 @@ def midi_port_connect_source(port: MIDIPortRef, source: MIDIEndpointRef) -> None
 
 
 def midi_port_disconnect_source(port: MIDIPortRef, source: MIDIEndpointRef) -> None:
-    status = _coremidi.MIDIPortDisconnectSource(port, source)
-    if status != 0:
-        raise OSError(f"MIDIPortDisconnectSource failed with status {status}")
+    pass
 
 
 # --- Device / Source / Destination enumeration ---
@@ -258,22 +227,22 @@ _coremidi.MIDIEntityGetDestination.argtypes = [MIDIEntityRef, ItemCount]
 
 
 def get_number_of_devices() -> int:
-    return _coremidi.MIDIGetNumberOfDevices()
+    pass
 
 def get_device(index: int) -> MIDIDeviceRef:
-    return _coremidi.MIDIGetDevice(index)
+    pass
 
 def get_number_of_sources() -> int:
-    return _coremidi.MIDIGetNumberOfSources()
+    pass
 
 def get_source(index: int) -> MIDIEndpointRef:
-    return _coremidi.MIDIGetSource(index)
+    pass
 
 def get_number_of_destinations() -> int:
-    return _coremidi.MIDIGetNumberOfDestinations()
+    pass
 
 def get_destination(index: int) -> MIDIEndpointRef:
-    return _coremidi.MIDIGetDestination(index)
+    pass
 
 
 # --- Object properties ---
@@ -283,20 +252,11 @@ _coremidi.MIDIObjectGetStringProperty.argtypes = [MIDIObjectRef, CFStringRef, PO
 
 
 def get_endpoint_name(endpoint: MIDIEndpointRef) -> str:
-    cfstr = CFStringRef()
-    # kMIDIPropertyName is "name" as a CFStringRef
-    prop_name = cfstring_create("name")
-    status = _coremidi.MIDIObjectGetStringProperty(endpoint, prop_name, byref(cfstr))
-    cfrelease(prop_name)
-    if status != 0:
-        return f"<unknown endpoint {endpoint}>"
-    name = cfstring_to_str(cfstr)
-    cfrelease(cfstr)
-    return name
+    pass
 
 
 def get_device_name(device: MIDIDeviceRef) -> str:
-    return get_endpoint_name(device)
+    pass
 
 
 # --- Packet construction ---
@@ -317,17 +277,7 @@ def iter_packets(pktlist: MIDIPacketList) -> list[tuple[int, bytes]]:
     MIDIPacketList is variable-length: packets are laid out contiguously
     with each packet's size = 10 + length, padded to 4-byte alignment.
     """
-    results = []
-    # Address of the first packet in the list
-    offset = ctypes.addressof(pktlist.packet[0])
-    for _ in range(pktlist.numPackets):
-        ts = MIDITimeStamp.from_address(offset).value
-        length = c_uint16.from_address(offset + 8).value
-        data_ptr = (c_uint8 * length).from_address(offset + 10)
-        results.append((ts, bytes(data_ptr)))
-        # Advance: header (8 ts + 2 length) + data, padded to 4 bytes
-        offset += (10 + length + 3) & ~3
-    return results
+    pass
 
 
 def packet_list_init(pktlist: MIDIPacketList) -> POINTER(MIDIPacket):
